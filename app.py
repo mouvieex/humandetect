@@ -1,5 +1,11 @@
 import streamlit as st
-import cv2
+try:
+    import cv2
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "opencv-python-headless"])
+    import cv2
 import numpy as np
 from ultralytics import YOLO
 from PIL import Image
@@ -48,4 +54,5 @@ if uploaded_file is not None:
         data=result_bytes,
         file_name="result.jpg",
         mime="image/jpeg"
+
     )
