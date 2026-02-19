@@ -3,7 +3,6 @@ from ultralytics import YOLO
 from PIL import Image
 import numpy as np
 from io import BytesIO
-import torch
 
 st.set_page_config(page_title="Детектор Людей", page_icon="👤", layout="wide")
 st.title("👤 Детектор Людей")
@@ -12,13 +11,11 @@ st.markdown("### Быстрая детекция людей на фото")
 @st.cache_resource
 def load_model():
     model = YOLO('yolov8n.pt')
-    model.overrides['verbose'] = False
     return model
 
 model = load_model()
 
 st.sidebar.header("⚙️ Настройки")
-confidence_threshold = st.sidebar.slider("Минимальная уверенность", 0.1, 1.0, 0.5, 0.1)
 img_size = st.sidebar.selectbox("Размер изображения", [320, 480, 640], index=0)
 
 uploaded_file = st.file_uploader("📤 Загрузите фото (JPG, PNG)", type=['jpg', 'jpeg', 'png'])
@@ -42,13 +39,9 @@ if uploaded_file is not None:
                 results = model(
                     img_array,
                     verbose=False,
-                    conf=confidence_threshold,
+                    conf=0.5,
                     iou=0.45,
                     max_det=100,
-                    device='cpu',
-                    half=False,
-                    augment=False,
-                    agnostic=False,
                 )
                 
                 people_count = 0
@@ -59,7 +52,7 @@ if uploaded_file is not None:
                             cls_id = int(box.cls[0])
                             conf = float(box.conf[0])
                             
-                            if cls_id == 0 and conf >= confidence_threshold:
+                            if cls_id == 0 and conf >= 0.5:
                                 people_count += 1
                                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                                 
@@ -103,11 +96,5 @@ if uploaded_file is not None:
                 st.exception(e)
 
 st.sidebar.markdown("---")
-st.sidebar.info("""
-**💡 Советы:**
-- Меньший размер = быстрее
-- 320px: ~5-10 сек
-- 640px: ~15-30 сек
-""")
-
+st.sidebar.info("**💡 Советы:**\n- Меньший размер = быстрее\n- 320px: ~5-10 сек\n- 640px: ~15-30 сек")
 
