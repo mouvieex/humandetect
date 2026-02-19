@@ -42,7 +42,7 @@ if uploaded_file is not None:
                 img_array[y2-2:y2, x1:x2] = [0, 255, 0]  
     
     result_img = Image.fromarray(img_array)
-    st.image(result_img, use_column_width=True)
+    st.image(result_img, use_container_width=True)
     
    
     from io import BytesIO
@@ -56,3 +56,4 @@ if uploaded_file is not None:
         file_name="result.jpg",
         mime="image/jpeg"
     )
+
